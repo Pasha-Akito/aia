@@ -30,6 +30,14 @@ All arguments after `aia` form one prompt unless the first argument is a recogni
 
 Configuration is per user. `aia config` selects from all locally installed Ollama models. A missing configured model produces a clear recovery message; AIA does not silently replace or download it.
 
+## Interactive model menus
+
+The `setup`, `config`, and `delete` model menus show up to nine choices at a time, numbered `1` through `9`. Selection `0` always exits without downloading, changing, or deleting a model. The installed-model menus support additional pages so `config` and `delete` can list every installed model.
+
+## Model deletion
+
+`aia delete` removes a user-selected locally installed model through Ollama. Deleting the configured default clears that configuration and directs the user to `aia config` or `aia setup` before prompting.
+
 ## Model unloading
 
 AIA always attempts immediate unloading, including after interruption or generation failure. It uses bounded retries, may restart Ollama when normal unloading fails, verifies the outcome, and exposes `aia unload` for manual recovery.

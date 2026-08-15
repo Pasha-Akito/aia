@@ -37,15 +37,25 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - Retrieve the current popularity ordering from the Ollama model library without maintaining an AIA-owned catalogue.
 - Consider only local, general-purpose models with a downloadable variant expected to fit entirely in available VRAM; do not show partially fitting models.
 - Exclude models already installed.
-- Show up to ten eligible models, ordered by the Ollama library's popularity ranking, with useful selection details such as model name, download size, and estimated VRAM requirement.
-- Let the user select a model by entering `0` through `9`, download it, and make it the default.
+- Show up to nine eligible models, ordered by the Ollama library's popularity ranking, with useful selection details such as model name, download size, and estimated VRAM requirement.
+- Number model choices `1` through `9`, with `0` reserved for exiting without downloading a model or changing the default.
+- Download the selected model and make it the default.
 - Return a clear, actionable error when model discovery is unavailable or no compatible models are found.
 
 ### `aia config`
 
-- List locally installed Ollama models and allow the user to select the default.
+- List all locally installed Ollama models and allow the user to select the default, using additional pages when more than nine are installed.
+- Number the models on each page `1` through `9`, allow navigation between pages, and reserve `0` for exiting without changing the default.
 - If no models are installed, tell the user to run `aia setup`.
 - If the configured model was removed externally, report that clearly and require the user to choose or install another model.
+
+### `aia delete`
+
+- List all locally installed Ollama models and allow the user to select one to delete, using additional pages when more than nine are installed.
+- Number the models on each page `1` through `9`, allow navigation between pages, and reserve `0` for exiting without deleting a model.
+- Delete the selected model through Ollama.
+- If the deleted model was the configured default, clear the default and tell the user to run `aia config` or `aia setup` before prompting.
+- If no models are installed, report that there is nothing to delete.
 
 ### `aia <message>`
 
@@ -83,8 +93,9 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - `aia help` lists every available AIA command.
 - Running `aia` without a command or message returns a nonzero exit status and tells the user to specify a command and use `aia help`.
 - On supported Arch Linux and NVIDIA hardware, `aia first-time-setup` explains its changes, installs missing requirements with interactive privilege escalation, starts Ollama, installs AIA, and verifies the result.
-- `aia setup` shows at most ten popular, uninstalled Ollama models expected to fit in currently available VRAM, lets the user select one, downloads it, and makes it the default.
-- `aia config` changes the default among locally installed models, and subsequent questions use the new selection.
+- `aia setup` shows at most nine popular, uninstalled Ollama models expected to fit in currently available VRAM, numbers them `1` through `9`, reserves `0` for exit, and downloads and configures the selected model.
+- `aia config` lists every locally installed model across pages of choices numbered `1` through `9`, reserves `0` for exit, changes the default when a model is selected, and subsequent questions use the new selection.
+- `aia delete` lists every locally installed model across pages of choices numbered `1` through `9`, reserves `0` for exit, and deletes the selected model; deleting the configured default clears it and provides a recovery instruction.
 - When no model is installed or the configured model is missing, AIA gives a clear recovery instruction.
 - Given a configured model, `aia What does the ls command do?` streams an answer without requiring quotation marks.
 - The command exits after returning the response and confirms that the model was unloaded.

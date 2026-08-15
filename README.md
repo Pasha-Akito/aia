@@ -12,15 +12,19 @@ The initial target is Arch Linux with an NVIDIA GPU. Ollama provides model execu
 aia first-time-setup
 aia setup
 aia config
+aia delete
 aia unload
 aia <message>
 ```
 
 - `aia first-time-setup` explains and installs missing dependencies, configures Ollama, and installs the `aia` executable. It shows privileged operations before invoking `sudo` interactively.
-- `aia setup` detects currently available VRAM and offers up to ten popular, uninstalled Ollama models expected to fit fully in it.
+- `aia setup` detects currently available VRAM and offers up to nine popular, uninstalled Ollama models expected to fit fully in it.
 - `aia config` selects the default from locally installed Ollama models.
+- `aia delete` deletes a selected locally installed Ollama model.
 - `aia <message>` treats all remaining arguments as one prompt, so quotation marks are not required.
 - `aia unload` retries model unloading and applies the same recovery used after a prompt.
+
+The interactive model menus number choices `1` through `9` and reserve `0` for exiting without making a change. Installed-model menus use additional pages when needed so every installed model remains available.
 
 ## Runtime behavior
 
@@ -36,4 +40,3 @@ Operational diagnostics are written to a per-user log file. Warnings and errors 
 
 - [`SPEC.md`](SPEC.md) defines required behavior and acceptance criteria.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) records durable product and architecture decisions.
-
