@@ -32,7 +32,7 @@ Configuration is per user. `aia config` selects from all locally installed Ollam
 
 ## Interactive model menus
 
-The `setup`, `config`, and `delete` model menus show up to nine choices at a time, numbered `1` through `9`. Selection `0` always exits without downloading, changing, or deleting a model. The installed-model menus support additional pages so `config` and `delete` can list every installed model.
+The `setup`, `config`, and `delete` model menus show up to seven models at a time, numbered `1` through `7`. Selection `8` requests the previous page, `9` requests the next page, and `0` exits without downloading, changing, or deleting a model. Requesting a page that does not exist leaves the user on the current page. Setup is limited to three pages, while `config` and `delete` use as many pages as needed to list every installed model.
 
 ## Model deletion
 
@@ -45,6 +45,10 @@ AIA always attempts immediate unloading, including after interruption or generat
 ## Logging and privacy
 
 Normal terminal output stays concise, while detailed operational diagnostics go to a per-user log and optionally the terminal with `--verbose`. Prompts and model responses are excluded from diagnostic logs by default.
+
+## User-facing validation
+
+Acceptance requires end-to-end scenarios through the installed CLI, not only unit-level evidence. Validation invokes every command advertised by help and follows a safe exit or completion path, exercises menu navigation, and verifies a real model can be downloaded, used, deleted, and downloaded again. Pull requests distinguish simulated integration coverage from validation performed with real Arch Linux, NVIDIA hardware, and Ollama.
 
 ## Product direction and implementation mechanics
 
