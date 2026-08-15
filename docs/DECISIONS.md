@@ -46,6 +46,10 @@ AIA always attempts immediate unloading, including after interruption or generat
 
 Normal terminal output stays concise, while detailed operational diagnostics go to a per-user log and optionally the terminal with `--verbose`. Prompts and model responses are excluded from diagnostic logs by default.
 
+## Terminal experience
+
+AIA prioritizes quick, focused interaction. Normal interactive commands display one short, self-explanatory instruction followed immediately by the available choices: `Select a model to install:`, `Select your default model:`, or `Delete installed models:`. Redundant explanation and implementation detail are omitted; required safety information and errors remain brief and actionable. Detailed operational information belongs in logs and `--verbose` output.
+
 ## User-facing validation
 
 Acceptance requires end-to-end scenarios through the installed CLI, not only unit-level evidence. Validation invokes every command advertised by help and follows a safe exit or completion path, exercises menu navigation, and verifies a real model can be downloaded, used, deleted, and downloaded again. Pull requests distinguish simulated integration coverage from validation performed with real Arch Linux, NVIDIA hardware, and Ollama.

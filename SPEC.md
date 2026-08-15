@@ -42,6 +42,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - Show up to three pages of seven eligible models, ordered by the Ollama library's popularity ranking, with useful selection details such as model name, download size, and estimated VRAM requirement.
 - On each page, number model choices `1` through `7`, use `8` for the previous page, use `9` for the next page, and reserve `0` for exiting without downloading a model or changing the default.
 - If the requested previous or next page does not exist, remain on the current page without changing anything.
+- Introduce the menu with the single instruction `Select a model to install:` followed immediately by the choices and navigation controls.
 - Download the selected model and make it the default.
 - Return a clear, actionable error when model discovery is unavailable or no compatible models are found.
 
@@ -50,6 +51,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - List all locally installed Ollama models and allow the user to select the default, using as many pages as necessary.
 - On each page, number model choices `1` through `7`, use `8` for the previous page, use `9` for the next page, and reserve `0` for exiting without changing the default.
 - If the requested previous or next page does not exist, remain on the current page without changing anything.
+- Introduce the menu with the single instruction `Select your default model:` followed immediately by the choices and navigation controls.
 - If no models are installed, tell the user to run `aia setup`.
 - If the configured model was removed externally, report that clearly and require the user to choose or install another model.
 
@@ -58,6 +60,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - List all locally installed Ollama models and allow the user to select one to delete, using as many pages as necessary.
 - On each page, number model choices `1` through `7`, use `8` for the previous page, use `9` for the next page, and reserve `0` for exiting without deleting a model.
 - If the requested previous or next page does not exist, remain on the current page without changing anything.
+- Introduce the menu with the single instruction `Delete installed models:` followed immediately by the choices and navigation controls.
 - Delete the selected model through Ollama.
 - If the deleted model was the configured default, clear the default and tell the user to run `aia config` or `aia setup` before prompting.
 - If no models are installed, report that there is nothing to delete.
@@ -79,7 +82,10 @@ AIA manages first-time installation, model discovery and selection, configuratio
 
 ## Logging and errors
 
-- Show concise status, streamed answers, warnings, and actionable errors in the terminal.
+- Keep all normal terminal communication as concise and self-explanatory as possible. Do not print introductions, repeated explanations, implementation details, or success text that does not help the user decide or act.
+- For interactive commands, show one short instruction followed immediately by the available choices.
+- Keep required safety disclosures, warnings, and errors brief while still naming the problem and the next action.
+- Show only concise status, streamed answers, warnings, and actionable errors in the terminal.
 - Write detailed operational diagnostics to a timestamped per-user log file.
 - Mirror detailed diagnostics to the terminal when `--verbose` is used.
 - Do not record prompts or model responses in diagnostic logs by default.
@@ -101,6 +107,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - Validate both first-time-setup confirmation paths: declining must exit without invoking `sudo` or changing the system, while confirming must proceed with the explained installation plan.
 - Validate the complete model lifecycle by using `aia setup` to download and configure a model, prompting that model through `aia <message>`, deleting it through `aia delete`, and downloading it again through `aia setup`.
 - Exercise menu navigation from a user's perspective, including model selection, exit with `0`, previous page with `8`, next page with `9`, and unavailable-page navigation that remains safely on the current page.
+- Review the actual terminal transcript for every end-to-end scenario and verify that normal output contains only the short instruction, necessary choices or status, and any action the user must take.
 - Run supported-platform scenarios against a real Arch Linux, NVIDIA, and Ollama environment when they depend on actual system integration. Clearly distinguish real-system results from simulated integration results in the pull request.
 - Record the scenarios performed, their observable results, and any environment limitation in the pull request so acceptance evidence can be reviewed before merge.
 
@@ -118,5 +125,6 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - Interruptions and generation failures still trigger bounded unloading recovery.
 - When normal unloading fails, AIA retries, restarts Ollama, verifies the result, and reports any remaining failure with an `aia unload` recovery path.
 - Operational failures produce actionable terminal messages, detailed diagnostic logs, and nonzero exit statuses.
+- Normal command output is concise and self-explanatory; `setup`, `config`, and `delete` use their specified single-line instructions without redundant explanatory text.
 - End-to-end validation invokes every command advertised by `aia help` and safely exits or completes it through its user-facing interface.
 - A real-system model lifecycle test downloads and configures a model, uses it for a prompt, deletes it, and downloads it again successfully.

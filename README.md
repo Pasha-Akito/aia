@@ -26,6 +26,8 @@ aia <message>
 
 The interactive model menus use `1` through `7` for models, `8` for the previous page, `9` for the next page, and `0` to exit without making a change. Setup provides at most three pages; installed-model menus use as many pages as needed so every installed model remains available.
 
+Normal terminal output stays minimal: one short instruction followed by the choices, concise status when useful, and actionable errors only. Detailed diagnostics belong in the log or `--verbose` output.
+
 User-facing end-to-end validation is required alongside automated tests. It includes invoking every command advertised by `aia help` and safely exiting or completing it, plus a real model lifecycle that downloads, uses, deletes, and downloads a model again.
 
 ## Runtime behavior
