@@ -16,7 +16,7 @@ The first supported environment is Arch Linux with an NVIDIA GPU. A narrower pla
 
 ## First-time installation
 
-`aia first-time-setup` may invoke `sudo` interactively to install dependencies and configure Ollama. It must explain privileged operations before executing them, favoring a simple installation flow without hiding system changes.
+`aia first-time-setup` may invoke `sudo` interactively to install dependencies and configure Ollama. It must explain privileged operations and planned changes, then obtain explicit yes-or-no confirmation before executing them. Declining, end-of-input, or interruption at the confirmation exits without changing the system.
 
 ## Model discovery
 
@@ -32,7 +32,7 @@ Configuration is per user. `aia config` selects from all locally installed Ollam
 
 ## Interactive model menus
 
-The `setup`, `config`, and `delete` model menus show up to nine choices at a time, numbered `1` through `9`. Selection `0` always exits without downloading, changing, or deleting a model. The installed-model menus support additional pages so `config` and `delete` can list every installed model.
+The `setup`, `config`, and `delete` model menus show up to seven models at a time, numbered `1` through `7`. Selection `8` requests the previous page, `9` requests the next page, and `0` exits without downloading, changing, or deleting a model. Requesting a page that does not exist leaves the user on the current page. Setup is limited to three pages, while `config` and `delete` use as many pages as needed to list every installed model.
 
 ## Model deletion
 
@@ -45,6 +45,14 @@ AIA always attempts immediate unloading, including after interruption or generat
 ## Logging and privacy
 
 Normal terminal output stays concise, while detailed operational diagnostics go to a per-user log and optionally the terminal with `--verbose`. Prompts and model responses are excluded from diagnostic logs by default.
+
+## Terminal experience
+
+AIA prioritizes quick, focused interaction. Normal interactive commands display one short, self-explanatory instruction followed immediately by the available choices: `Select a model to install:`, `Select your default model:`, or `Delete installed models:`. Redundant explanation and implementation detail are omitted; required safety information and errors remain brief and actionable. Detailed operational information belongs in logs and `--verbose` output.
+
+## User-facing validation
+
+Acceptance requires end-to-end scenarios through the installed CLI, not only unit-level evidence. Validation invokes every command advertised by help and follows a safe exit or completion path, exercises menu navigation, and verifies a real model can be downloaded, used, deleted, and downloaded again. Pull requests distinguish simulated integration coverage from validation performed with real Arch Linux, NVIDIA hardware, and Ollama.
 
 ## Product direction and implementation mechanics
 

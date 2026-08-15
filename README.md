@@ -17,14 +17,18 @@ aia unload
 aia <message>
 ```
 
-- `aia first-time-setup` explains and installs missing dependencies, configures Ollama, and installs the `aia` executable. It shows privileged operations before invoking `sudo` interactively.
-- `aia setup` detects currently available VRAM and offers up to nine popular, uninstalled Ollama models expected to fit fully in it.
+- `aia first-time-setup` explains the dependencies, privileged operations, and planned changes, then asks for confirmation. Declining exits without changing the system; confirming installs missing dependencies, configures Ollama, and installs the `aia` executable with interactive `sudo` when needed.
+- `aia setup` detects currently available VRAM and offers up to three pages of seven popular, uninstalled Ollama models expected to fit fully in it.
 - `aia config` selects the default from locally installed Ollama models.
 - `aia delete` deletes a selected locally installed Ollama model.
 - `aia <message>` treats all remaining arguments as one prompt, so quotation marks are not required.
 - `aia unload` retries model unloading and applies the same recovery used after a prompt.
 
-The interactive model menus number choices `1` through `9` and reserve `0` for exiting without making a change. Installed-model menus use additional pages when needed so every installed model remains available.
+The interactive model menus use `1` through `7` for models, `8` for the previous page, `9` for the next page, and `0` to exit without making a change. Setup provides at most three pages; installed-model menus use as many pages as needed so every installed model remains available.
+
+Normal terminal output stays minimal: one short instruction followed by the choices, concise status when useful, and actionable errors only. Detailed diagnostics belong in the log or `--verbose` output.
+
+User-facing end-to-end validation is required alongside automated tests. It includes invoking every command advertised by `aia help` and safely exiting or completing it, plus a real model lifecycle that downloads, uses, deletes, and downloads a model again.
 
 ## Runtime behavior
 
