@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ollama-assistant"
+version = "0.1.0"
+description = "A concise, single-turn assistant for local Ollama models"
+requires-python = ">=3.11"
+
+[project.scripts]
+aia = "aia.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -9,6 +9,7 @@ The initial target is Arch Linux with an NVIDIA GPU. Ollama provides model execu
 ## Commands
 
 ```text
+aia help
 aia first-time-setup
 aia setup
 aia config
@@ -18,6 +19,7 @@ aia <message>
 ```
 
 - `aia first-time-setup` explains the dependencies, privileged operations, and planned changes, then asks for confirmation. Declining exits without changing the system; confirming installs missing dependencies, configures Ollama, and installs the `aia` executable with interactive `sudo` when needed.
+- `aia help` lists the available commands.
 - `aia setup` detects currently available VRAM and offers up to three pages of seven popular, uninstalled Ollama models expected to fit fully in it.
 - `aia config` selects the default from locally installed Ollama models.
 - `aia delete` deletes a selected locally installed Ollama model.
@@ -38,7 +40,25 @@ Operational diagnostics are written to a per-user log file. Warnings and errors 
 
 ## Installation and removal
 
-`aia first-time-setup` is the supported installation path. Before changing the system, it must explain the dependencies and privileged commands it will use. Removal instructions must identify every AIA-owned file and must not remove user-installed Ollama models without explicit confirmation.
+From a source checkout, run:
+
+```text
+./bin/aia first-time-setup
+```
+
+The command explains its changes and asks for confirmation before invoking `sudo`. On confirmation it installs Arch's `ollama-cuda` package when needed, enables and starts `ollama.service`, and installs AIA at `/usr/local/bin/aia`.
+
+AIA stores per-user configuration at `${XDG_CONFIG_HOME:-~/.config}/aia/config.json` and logs at `${XDG_STATE_HOME:-~/.local/state}/aia/logs/`.
+
+To remove AIA itself:
+
+```text
+sudo rm /usr/local/bin/aia
+rm -r "${XDG_CONFIG_HOME:-$HOME/.config}/aia"
+rm -r "${XDG_STATE_HOME:-$HOME/.local/state}/aia"
+```
+
+If Ollama was installed only for AIA, it can separately be disabled with `sudo systemctl disable --now ollama` and removed with `sudo pacman -Rns ollama-cuda ollama`. Ollama models are user data and must not be removed without explicit confirmation.
 
 ## Project documents
 
