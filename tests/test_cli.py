@@ -83,6 +83,7 @@ class CliFunctionalTests(unittest.TestCase):
         rendered = "\n".join(self.output)
         for command in COMMANDS:
             self.assertIn(f"aia {command}", rendered)
+        self.assertIn("aia setup            Select a model to install", rendered)
 
     def test_ollama_host_is_normalized(self) -> None:
         self.assertEqual(ollama_api_url("127.0.0.1:11434"), "http://127.0.0.1:11434/api")

@@ -18,7 +18,7 @@ from .system import available_vram_bytes, restart_ollama
 COMMANDS = {
     "help": "Show commands",
     "first-time-setup": "Install AIA and Ollama",
-    "setup": "Install and select a model",
+    "setup": "Select a model to install",
     "config": "Select the default model",
     "delete": "Delete an installed model",
     "unload": "Unload running models",
