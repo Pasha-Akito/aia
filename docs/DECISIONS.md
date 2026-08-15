@@ -16,7 +16,7 @@ The first supported environment is Arch Linux with an NVIDIA GPU. A narrower pla
 
 ## First-time installation
 
-`aia first-time-setup` may invoke `sudo` interactively to install dependencies and configure Ollama. It must explain privileged operations before executing them, favoring a simple installation flow without hiding system changes.
+`aia first-time-setup` may invoke `sudo` interactively to install dependencies and configure Ollama. It must explain privileged operations and planned changes, then obtain explicit yes-or-no confirmation before executing them. Declining, end-of-input, or interruption at the confirmation exits without changing the system.
 
 ## Model discovery
 

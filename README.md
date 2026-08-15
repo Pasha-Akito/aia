@@ -17,7 +17,7 @@ aia unload
 aia <message>
 ```
 
-- `aia first-time-setup` explains and installs missing dependencies, configures Ollama, and installs the `aia` executable. It shows privileged operations before invoking `sudo` interactively.
+- `aia first-time-setup` explains the dependencies, privileged operations, and planned changes, then asks for confirmation. Declining exits without changing the system; confirming installs missing dependencies, configures Ollama, and installs the `aia` executable with interactive `sudo` when needed.
 - `aia setup` detects currently available VRAM and offers up to three pages of seven popular, uninstalled Ollama models expected to fit fully in it.
 - `aia config` selects the default from locally installed Ollama models.
 - `aia delete` deletes a selected locally installed Ollama model.

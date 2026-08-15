@@ -23,6 +23,8 @@ AIA manages first-time installation, model discovery and selection, configuratio
 ### `aia first-time-setup`
 
 - Explain which dependencies and privileged operations are required before making changes.
+- After presenting the plan, ask the user to confirm whether to continue before making any change or invoking `sudo`.
+- Accept `yes` or `y` case-insensitively to continue and `no` or `n` to exit successfully without changing the system. Treat end-of-input or interruption at the confirmation as cancellation, and ask again after other input.
 - Interactively invoke `sudo` when needed.
 - Install Ollama and other required dependencies when absent.
 - Enable and start the Ollama system service.
@@ -96,6 +98,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - Treat user-visible end-to-end scenarios as required validation, in addition to lower-level automated tests.
 - Exercise commands through the installed `aia` executable and their real user-facing prompts, output, exit statuses, configuration, Ollama operations, and recovery paths.
 - Validate that every command shown by `aia help` can actually be invoked. Where completing a command would make an unwanted change, follow its normal exit or cancellation path and verify that it exits safely without changing state.
+- Validate both first-time-setup confirmation paths: declining must exit without invoking `sudo` or changing the system, while confirming must proceed with the explained installation plan.
 - Validate the complete model lifecycle by using `aia setup` to download and configure a model, prompting that model through `aia <message>`, deleting it through `aia delete`, and downloading it again through `aia setup`.
 - Exercise menu navigation from a user's perspective, including model selection, exit with `0`, previous page with `8`, next page with `9`, and unavailable-page navigation that remains safely on the current page.
 - Run supported-platform scenarios against a real Arch Linux, NVIDIA, and Ollama environment when they depend on actual system integration. Clearly distinguish real-system results from simulated integration results in the pull request.
@@ -105,7 +108,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 
 - `aia help` lists every available AIA command.
 - Running `aia` without a command or message returns a nonzero exit status and tells the user to specify a command and use `aia help`.
-- On supported Arch Linux and NVIDIA hardware, `aia first-time-setup` explains its changes, installs missing requirements with interactive privilege escalation, starts Ollama, installs AIA, and verifies the result.
+- On supported Arch Linux and NVIDIA hardware, `aia first-time-setup` explains its changes and asks for confirmation before invoking `sudo` or changing the system; declining exits successfully without changes, while confirming installs missing requirements with interactive privilege escalation, starts Ollama, installs AIA, and verifies the result.
 - `aia setup` shows at most three pages of seven popular, uninstalled Ollama models expected to fit in currently available VRAM; `1` through `7` select a model, `8` and `9` navigate, and `0` exits.
 - `aia config` lists every locally installed model across as many seven-model pages as necessary; `1` through `7` select a model, `8` and `9` navigate, and `0` exits. A selection changes the default, and subsequent questions use it.
 - `aia delete` lists every locally installed model across as many seven-model pages as necessary; `1` through `7` select a model, `8` and `9` navigate, and `0` exits. A selection deletes the model; deleting the configured default clears it and provides a recovery instruction.
