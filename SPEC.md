@@ -11,6 +11,15 @@ AIA manages first-time installation, model discovery and selection, configuratio
 
 ## Commands
 
+### `aia help`
+
+- List every available AIA command with enough information for the user to identify the appropriate command.
+
+### `aia`
+
+- When invoked without a command or message, return a clear error telling the user to specify a command and run `aia help` to see the available commands.
+- Exit with a nonzero status.
+
 ### `aia first-time-setup`
 
 - Explain which dependencies and privileged operations are required before making changes.
@@ -71,6 +80,8 @@ AIA manages first-time installation, model discovery and selection, configuratio
 
 ## Acceptance criteria
 
+- `aia help` lists every available AIA command.
+- Running `aia` without a command or message returns a nonzero exit status and tells the user to specify a command and use `aia help`.
 - On supported Arch Linux and NVIDIA hardware, `aia first-time-setup` explains its changes, installs missing requirements with interactive privilege escalation, starts Ollama, installs AIA, and verifies the result.
 - `aia setup` shows at most ten popular, uninstalled Ollama models expected to fit in currently available VRAM, lets the user select one, downloads it, and makes it the default.
 - `aia config` changes the default among locally installed models, and subsequent questions use the new selection.
