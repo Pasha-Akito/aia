@@ -17,8 +17,8 @@ from .system import available_vram_bytes, restart_ollama
 
 COMMANDS = {
     "help": "Show commands",
-    "first-time-setup": "Install AIA and Ollama",
-    "setup": "Select a model to install",
+    "setup": "Install AIA and Ollama",
+    "download": "Select a model to install",
     "config": "Select the default model",
     "delete": "Delete an installed model",
     "unload": "Unload running models",
@@ -72,7 +72,7 @@ def recover_unload(client: OllamaClient, model: str) -> bool:
     return False
 
 
-def setup_command(
+def download_command(
     client: OllamaClient,
     store: ConfigStore,
     *,
@@ -108,7 +108,7 @@ def config_command(
 ) -> int:
     models = client.installed_models()
     if not models:
-        raise AiaError("No models installed. Run: aia setup")
+        raise AiaError("No models installed. Run: aia download")
     configured = store.get_default()
     installed = {model_name(model) for model in models}
     if configured and configured not in installed:
@@ -143,7 +143,7 @@ def delete_command(
     client.delete(name)
     if store.get_default() == name:
         store.clear_default()
-        output("Default deleted. Run: aia config or aia setup")
+        output("Default deleted. Run: aia config or aia download")
     else:
         output(f"Deleted: {name}")
     return 0
@@ -166,9 +166,9 @@ def prompt_command(
     model = store.get_default()
     installed = {model_name(item) for item in client.installed_models()}
     if not model:
-        raise AiaError("No default model. Run: aia setup")
+        raise AiaError("No default model. Run: aia download")
     if model not in installed:
-        raise AiaError("Default model missing. Run: aia config or aia setup")
+        raise AiaError("Default model missing. Run: aia config or aia download")
     try:
         for text in client.generate(model, message):
             output_stream.write(text)
@@ -179,7 +179,6 @@ def prompt_command(
     finally:
         if not recover_unload(client, model):
             raise AiaError(f"Model still loaded: {model}. Run: aia unload")
-        output_stream.write("Model unloaded.\n")
     return 0
 
 
@@ -217,10 +216,10 @@ def main(
     try:
         if command == "help":
             result = help_command(output)
-        elif command == "first-time-setup":
-            result = first_time_setup(input_fn=input_fn, output=output)
         elif command == "setup":
-            result = setup_command(
+            result = first_time_setup(input_fn=input_fn, output=output)
+        elif command == "download":
+            result = download_command(
                 client, store, input_fn=input_fn, output=output, progress=progress
             )
         elif command == "config":

@@ -123,18 +123,18 @@ class InstalledExecutableEndToEndTests(unittest.TestCase):
         )
 
     def test_download_use_delete_and_download_again(self) -> None:
-        first_setup = self.run_aia("setup", input_text="1\n")
-        self.assertEqual(first_setup.returncode, 0, first_setup.stderr)
+        first_download = self.run_aia("download", input_text="1\n")
+        self.assertEqual(first_download.returncode, 0, first_download.stderr)
         self.assertIn(
             "Retrieving models...\nSelect a model to install:\n1. tiny:1b",
-            first_setup.stdout,
+            first_download.stdout,
         )
-        self.assertIn("Downloading tiny:1b:  50%", first_setup.stdout)
-        self.assertIn("Downloading tiny:1b: 100%", first_setup.stdout)
+        self.assertIn("Downloading tiny:1b:  50%", first_download.stdout)
+        self.assertIn("Downloading tiny:1b: 100%", first_download.stdout)
 
         prompt = self.run_aia("What", "does", "ls", "do?")
         self.assertEqual(prompt.returncode, 0, prompt.stderr)
-        self.assertEqual(prompt.stdout, "It works.\nModel unloaded.\n")
+        self.assertEqual(prompt.stdout, "It works.\n")
         self.assertEqual(LifecycleHandler.running, [])
 
         deletion = self.run_aia("delete", input_text="1\n")
@@ -142,16 +142,16 @@ class InstalledExecutableEndToEndTests(unittest.TestCase):
         self.assertIn("Delete installed models:\n1. tiny:1b", deletion.stdout)
         self.assertEqual(LifecycleHandler.installed, [])
 
-        second_setup = self.run_aia("setup", input_text="1\n")
-        self.assertEqual(second_setup.returncode, 0, second_setup.stderr)
+        second_download = self.run_aia("download", input_text="1\n")
+        self.assertEqual(second_download.returncode, 0, second_download.stderr)
         self.assertEqual(LifecycleHandler.installed[0]["name"], "tiny:1b")
 
     def test_help_commands_are_reachable_and_setup_can_cancel(self) -> None:
         help_result = self.run_aia("help")
         self.assertEqual(help_result.returncode, 0)
-        for command in ("help", "first-time-setup", "setup", "config", "delete", "unload"):
+        for command in ("help", "setup", "download", "config", "delete", "unload"):
             self.assertIn(f"aia {command}", help_result.stdout)
-        cancelled = self.run_aia("first-time-setup", input_text="n\n")
+        cancelled = self.run_aia("setup", input_text="n\n")
         self.assertEqual(cancelled.returncode, 0)
         self.assertEqual(
             cancelled.stdout,

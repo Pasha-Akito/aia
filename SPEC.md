@@ -20,7 +20,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - When invoked without a command or message, return a clear error telling the user to specify a command and run `aia help` to see the available commands.
 - Exit with a nonzero status.
 
-### `aia first-time-setup`
+### `aia setup`
 
 - Explain which dependencies and privileged operations are required before making changes.
 - After presenting the plan, ask the user to confirm whether to continue before making any change or invoking `sudo`.
@@ -32,11 +32,11 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - Verify the NVIDIA tooling, Ollama service, and AIA installation.
 - Document all installation and removal behavior in the README.
 
-### `aia setup`
+### `aia download`
 
 - Require a working first-time installation.
 - Immediately show `Retrieving models...` while model discovery is running.
-- Calculate available VRAM as total NVIDIA GPU VRAM minus current usage at setup time.
+- Calculate available VRAM as total NVIDIA GPU VRAM minus current usage at download time.
 - Retrieve the current popularity ordering from the Ollama model library without maintaining an AIA-owned catalogue.
 - Consider only local, general-purpose models with a downloadable variant expected to fit entirely in available VRAM; do not show partially fitting models.
 - Exclude models already installed.
@@ -54,7 +54,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - On each page, number model choices `1` through `7`, use `8` for the previous page, use `9` for the next page, and reserve `0` for exiting without changing the default.
 - If the requested previous or next page does not exist, remain on the current page without changing anything.
 - Introduce the menu with the single instruction `Select your default model:` followed immediately by the choices and navigation controls.
-- If no models are installed, tell the user to run `aia setup`.
+- If no models are installed, tell the user to run `aia download`.
 - If the configured model was removed externally, report that clearly and require the user to choose or install another model.
 
 ### `aia delete`
@@ -64,7 +64,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - If the requested previous or next page does not exist, remain on the current page without changing anything.
 - Introduce the menu with the single instruction `Delete installed models:` followed immediately by the choices and navigation controls.
 - Delete the selected model through Ollama.
-- If the deleted model was the configured default, clear the default and tell the user to run `aia config` or `aia setup` before prompting.
+- If the deleted model was the configured default, clear the default and tell the user to run `aia config` or `aia download` before prompting.
 - If no models are installed, report that there is nothing to delete.
 
 ### `aia <message>`
@@ -106,8 +106,8 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - Treat user-visible end-to-end scenarios as required validation, in addition to lower-level automated tests.
 - Exercise commands through the installed `aia` executable and their real user-facing prompts, output, exit statuses, configuration, Ollama operations, and recovery paths.
 - Validate that every command shown by `aia help` can actually be invoked. Where completing a command would make an unwanted change, follow its normal exit or cancellation path and verify that it exits safely without changing state.
-- Validate both first-time-setup confirmation paths: declining must exit without invoking `sudo` or changing the system, while confirming must proceed with the explained installation plan.
-- Validate the complete model lifecycle by using `aia setup` to download and configure a model, prompting that model through `aia <message>`, deleting it through `aia delete`, and downloading it again through `aia setup`.
+- Validate both setup confirmation paths: declining must exit without invoking `sudo` or changing the system, while confirming must proceed with the explained installation plan.
+- Validate the complete model lifecycle by using `aia download` to download and configure a model, prompting that model through `aia <message>`, deleting it through `aia delete`, and downloading it again through `aia download`.
 - Exercise menu navigation from a user's perspective, including model selection, exit with `0`, previous page with `8`, next page with `9`, and unavailable-page navigation that remains safely on the current page.
 - Review the actual terminal transcript for every end-to-end scenario and verify that normal output contains only the short instruction, necessary choices or status, and any action the user must take.
 - Run supported-platform scenarios against a real Arch Linux, NVIDIA, and Ollama environment when they depend on actual system integration. Clearly distinguish real-system results from simulated integration results in the pull request.
@@ -117,16 +117,16 @@ AIA manages first-time installation, model discovery and selection, configuratio
 
 - `aia help` lists every available AIA command.
 - Running `aia` without a command or message returns a nonzero exit status and tells the user to specify a command and use `aia help`.
-- On supported Arch Linux and NVIDIA hardware, `aia first-time-setup` explains its changes and asks for confirmation before invoking `sudo` or changing the system; declining exits successfully without changes, while confirming installs missing requirements with interactive privilege escalation, starts Ollama, installs AIA, and verifies the result.
-- `aia setup` shows at most three pages of seven popular, uninstalled Ollama models expected to fit in currently available VRAM; `1` through `7` select a model, `8` and `9` navigate, and `0` exits.
+- On supported Arch Linux and NVIDIA hardware, `aia setup` explains its changes and asks for confirmation before invoking `sudo` or changing the system; declining exits successfully without changes, while confirming installs missing requirements with interactive privilege escalation, starts Ollama, installs AIA, and verifies the result.
+- `aia download` shows at most three pages of seven popular, uninstalled Ollama models expected to fit in currently available VRAM; `1` through `7` select a model, `8` and `9` navigate, and `0` exits.
 - `aia config` lists every locally installed model across as many seven-model pages as necessary; `1` through `7` select a model, `8` and `9` navigate, and `0` exits. A selection changes the default, and subsequent questions use it.
 - `aia delete` lists every locally installed model across as many seven-model pages as necessary; `1` through `7` select a model, `8` and `9` navigate, and `0` exits. A selection deletes the model; deleting the configured default clears it and provides a recovery instruction.
 - When no model is installed or the configured model is missing, AIA gives a clear recovery instruction.
 - Given a configured model, `aia What does the ls command do?` streams an answer without requiring quotation marks.
-- The command exits after returning the response and confirms that the model was unloaded.
+- The command exits after returning the response without printing a successful-unload message.
 - Interruptions and generation failures still trigger bounded unloading recovery.
 - When normal unloading fails, AIA retries, restarts Ollama, verifies the result, and reports any remaining failure with an `aia unload` recovery path.
 - Operational failures produce actionable terminal messages, detailed diagnostic logs, and nonzero exit statuses.
-- Normal command output is concise and self-explanatory; `setup`, `config`, and `delete` use their specified single-line instructions without redundant explanatory text.
+- Normal command output is concise and self-explanatory; `download`, `config`, and `delete` use their specified single-line instructions without redundant explanatory text.
 - End-to-end validation invokes every command advertised by `aia help` and safely exits or completes it through its user-facing interface.
 - A real-system model lifecycle test downloads and configures a model, uses it for a prompt, deletes it, and downloads it again successfully.
