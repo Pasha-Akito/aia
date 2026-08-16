@@ -3,6 +3,7 @@ from __future__ import annotations
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from threading import Thread
+import time
 import unittest
 
 from aia.ollama import OllamaClient
@@ -12,6 +13,7 @@ class FakeOllamaHandler(BaseHTTPRequestHandler):
     installed = [{"name": "tiny:latest", "size": 1000}]
     running = [{"name": "tiny:latest"}]
     requests: list[tuple[str, str, dict]] = []
+    pull_delay = 0.0
 
     def log_message(self, *_args) -> None:
         pass
@@ -40,6 +42,8 @@ class FakeOllamaHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         payload = self._payload()
         self.requests.append(("POST", self.path, payload))
+        if self.path == "/api/pull":
+            time.sleep(type(self).pull_delay)
         if self.path == "/api/generate" and payload.get("prompt"):
             body = b'{"response":"hello ","done":false}\n{"response":"world","done":true}\n'
             self.send_response(200)
@@ -79,6 +83,7 @@ class OllamaIntegrationTests(unittest.TestCase):
         FakeOllamaHandler.installed = [{"name": "tiny:latest", "size": 1000}]
         FakeOllamaHandler.running = [{"name": "tiny:latest"}]
         FakeOllamaHandler.requests = []
+        FakeOllamaHandler.pull_delay = 0.0
 
     def test_list_generate_unload_delete_lifecycle(self) -> None:
         self.assertEqual(self.client.installed_models()[0]["name"], "tiny:latest")
@@ -95,6 +100,12 @@ class OllamaIntegrationTests(unittest.TestCase):
             ("POST", "/api/pull", {"model": "tiny:latest", "stream": False}),
             FakeOllamaHandler.requests,
         )
+
+    def test_pull_is_not_limited_by_normal_request_timeout(self) -> None:
+        host, port = self.server.server_address
+        client = OllamaClient(f"http://{host}:{port}/api", timeout=0.01)
+        FakeOllamaHandler.pull_delay = 0.05
+        client.pull("tiny:latest")
 
     def test_unload_retries_are_bounded(self) -> None:
         attempts = 0

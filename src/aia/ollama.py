@@ -10,6 +10,8 @@ from urllib.request import Request, urlopen
 
 from .errors import AiaError
 
+_DEFAULT_TIMEOUT = object()
+
 
 class OllamaClient:
     def __init__(
@@ -23,7 +25,12 @@ class OllamaClient:
         self.timeout = timeout
 
     def _request(
-        self, method: str, endpoint: str, payload: dict[str, Any] | None = None
+        self,
+        method: str,
+        endpoint: str,
+        payload: dict[str, Any] | None = None,
+        *,
+        timeout: float | None | object = _DEFAULT_TIMEOUT,
     ) -> Any:
         body = json.dumps(payload).encode() if payload is not None else None
         request = Request(
@@ -33,9 +40,16 @@ class OllamaClient:
             headers={"Content-Type": "application/json"},
         )
         try:
-            with urlopen(request, timeout=self.timeout) as response:
+            request_timeout = self.timeout if timeout is _DEFAULT_TIMEOUT else timeout
+            with urlopen(request, timeout=request_timeout) as response:
                 content = response.read()
-        except (HTTPError, URLError, TimeoutError, OSError) as error:
+        except HTTPError as error:
+            self.logger.exception("Ollama request failed: %s %s", method, endpoint)
+            raise AiaError(f"Ollama request failed ({error.code}). Check the AIA log.") from error
+        except TimeoutError as error:
+            self.logger.exception("Ollama request timed out: %s %s", method, endpoint)
+            raise AiaError("Ollama request timed out. Try again.") from error
+        except (URLError, OSError) as error:
             self.logger.exception("Ollama request failed: %s %s", method, endpoint)
             raise AiaError("Ollama unavailable. Check: systemctl status ollama") from error
         if not content:
@@ -55,7 +69,9 @@ class OllamaClient:
 
     def pull(self, model: str) -> None:
         self.logger.info("Pulling model %s", model)
-        self._request("POST", "pull", {"model": model, "stream": False})
+        self._request(
+            "POST", "pull", {"model": model, "stream": False}, timeout=None
+        )
 
     def delete(self, model: str) -> None:
         self.logger.info("Deleting model %s", model)

@@ -35,6 +35,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 ### `aia setup`
 
 - Require a working first-time installation.
+- Immediately show `Retrieving models...` while model discovery is running.
 - Calculate available VRAM as total NVIDIA GPU VRAM minus current usage at setup time.
 - Retrieve the current popularity ordering from the Ollama model library without maintaining an AIA-owned catalogue.
 - Consider only local, general-purpose models with a downloadable variant expected to fit entirely in available VRAM; do not show partially fitting models.
