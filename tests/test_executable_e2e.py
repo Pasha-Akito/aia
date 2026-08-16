@@ -121,7 +121,10 @@ class InstalledExecutableEndToEndTests(unittest.TestCase):
     def test_download_use_delete_and_download_again(self) -> None:
         first_setup = self.run_aia("setup", input_text="1\n")
         self.assertEqual(first_setup.returncode, 0, first_setup.stderr)
-        self.assertIn("Select a model to install:\n1. tiny:1b", first_setup.stdout)
+        self.assertIn(
+            "Retrieving models...\nSelect a model to install:\n1. tiny:1b",
+            first_setup.stdout,
+        )
 
         prompt = self.run_aia("What", "does", "ls", "do?")
         self.assertEqual(prompt.returncode, 0, prompt.stderr)

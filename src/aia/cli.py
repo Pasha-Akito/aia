@@ -73,6 +73,7 @@ def setup_command(
     output: Callable[[str], None],
 ) -> int:
     installed = {model_name(item) for item in client.installed_models()}
+    output("Retrieving models...")
     candidates = LibraryClient().candidates(available_vram_bytes(), installed)
     selected = select_paged(
         "Select a model to install:",

@@ -119,6 +119,8 @@ class CliFunctionalTests(unittest.TestCase):
         self.assertEqual(self.invoke(["setup"], ["1"]), 0)
         self.assertEqual(self.client.pulled, ["tiny"])
         self.assertEqual(self.store.get_default(), "tiny")
+        self.assertEqual(self.output[0], "Retrieving models...")
+        self.assertEqual(self.output[1], "Select a model to install:")
 
     def test_unquoted_message_streams_and_unloads(self) -> None:
         self.store.set_default("model-1")
