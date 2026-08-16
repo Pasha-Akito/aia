@@ -16,11 +16,11 @@ The first supported environment is Arch Linux with an NVIDIA GPU. A narrower pla
 
 ## First-time installation
 
-`aia first-time-setup` may invoke `sudo` interactively to install dependencies and configure Ollama. It must explain privileged operations and planned changes, then obtain explicit yes-or-no confirmation before executing them. Declining, end-of-input, or interruption at the confirmation exits without changing the system.
+`aia setup` may invoke `sudo` interactively to install dependencies and configure Ollama. It must explain privileged operations and planned changes, then obtain explicit yes-or-no confirmation before executing them. Declining, end-of-input, or interruption at the confirmation exits without changing the system.
 
 ## Model discovery
 
-`aia setup` uses the current popularity ordering from the Ollama model library rather than maintaining an AIA-owned catalogue. It excludes installed models and variants that are not expected to fit entirely within total VRAM minus current usage.
+`aia download` uses the current popularity ordering from the Ollama model library rather than maintaining an AIA-owned catalogue. It excludes installed models and variants that are not expected to fit entirely within total VRAM minus current usage.
 
 ## Prompt interface
 
@@ -32,11 +32,11 @@ Configuration is per user. `aia config` selects from all locally installed Ollam
 
 ## Interactive model menus
 
-The `setup`, `config`, and `delete` model menus show up to seven models at a time, numbered `1` through `7`. Selection `8` requests the previous page, `9` requests the next page, and `0` exits without downloading, changing, or deleting a model. Requesting a page that does not exist leaves the user on the current page. Setup is limited to three pages, while `config` and `delete` use as many pages as needed to list every installed model.
+The `download`, `config`, and `delete` model menus show up to seven models at a time, numbered `1` through `7`. Selection `8` requests the previous page, `9` requests the next page, and `0` exits without downloading, changing, or deleting a model. Requesting a page that does not exist leaves the user on the current page. Download is limited to three pages, while `config` and `delete` use as many pages as needed to list every installed model.
 
 ## Model deletion
 
-`aia delete` removes a user-selected locally installed model through Ollama. Deleting the configured default clears that configuration and directs the user to `aia config` or `aia setup` before prompting.
+`aia delete` removes a user-selected locally installed model through Ollama. Deleting the configured default clears that configuration and directs the user to `aia config` or `aia download` before prompting.
 
 ## Model unloading
 

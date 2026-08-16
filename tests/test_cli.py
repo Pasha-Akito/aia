@@ -88,7 +88,7 @@ class CliFunctionalTests(unittest.TestCase):
         rendered = "\n".join(self.output)
         for command in COMMANDS:
             self.assertIn(f"aia {command}", rendered)
-        self.assertIn("aia setup            Select a model to install", rendered)
+        self.assertIn("aia download         Select a model to install", rendered)
 
     def test_ollama_host_is_normalized(self) -> None:
         self.assertEqual(ollama_api_url("127.0.0.1:11434"), "http://127.0.0.1:11434/api")
@@ -113,15 +113,15 @@ class CliFunctionalTests(unittest.TestCase):
         self.assertEqual(self.invoke(["delete"], ["1"]), 0)
         self.assertEqual(self.client.deleted, ["model-1"])
         self.assertIsNone(self.store.get_default())
-        self.assertIn("Default deleted. Run: aia config or aia setup", self.output)
+        self.assertIn("Default deleted. Run: aia config or aia download", self.output)
 
     @patch("aia.cli.available_vram_bytes", return_value=8 * 1024**3)
     @patch("aia.cli.LibraryClient")
-    def test_setup_downloads_and_configures_selection(self, library, _vram) -> None:
+    def test_download_downloads_and_configures_selection(self, library, _vram) -> None:
         library.return_value.candidates.return_value = [
             Candidate("tiny", 2 * 1024**3, 3 * 1024**3)
         ]
-        self.assertEqual(self.invoke(["setup"], ["1"]), 0)
+        self.assertEqual(self.invoke(["download"], ["1"]), 0)
         self.assertEqual(self.client.pulled, ["tiny"])
         self.assertEqual(self.store.get_default(), "tiny")
         self.assertEqual(self.output[0], "Retrieving models...")
@@ -133,7 +133,7 @@ class CliFunctionalTests(unittest.TestCase):
         stream = StringIO()
         with redirect_stdout(stream):
             self.assertEqual(self.invoke(["What", "is", "ls?"]), 0)
-        self.assertEqual(stream.getvalue(), "answer\nModel unloaded.\n")
+        self.assertEqual(stream.getvalue(), "answer\n")
         self.assertEqual(self.client.unloaded, ["model-1"])
 
     def test_prompt_and_response_are_not_logged(self) -> None:
@@ -170,12 +170,12 @@ class CliFunctionalTests(unittest.TestCase):
         self.assertEqual(self.output[:2], ["Default model missing.", "Select your default model:"])
 
     def test_every_help_command_has_a_safe_invocation(self) -> None:
-        safe_inputs = {"first-time-setup": ["n"], "setup": ["0"], "config": ["0"], "delete": ["0"]}
+        safe_inputs = {"setup": ["n"], "download": ["0"], "config": ["0"], "delete": ["0"]}
         for command in COMMANDS:
             with self.subTest(command=command):
                 self.output.clear()
                 self.errors.clear()
-                if command == "setup":
+                if command == "download":
                     with patch("aia.cli.available_vram_bytes", return_value=8 * 1024**3), patch(
                         "aia.cli.LibraryClient"
                     ) as library:
