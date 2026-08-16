@@ -45,6 +45,7 @@ AIA manages first-time installation, model discovery and selection, configuratio
 - If the requested previous or next page does not exist, remain on the current page without changing anything.
 - Introduce the menu with the single instruction `Select a model to install:` followed immediately by the choices and navigation controls.
 - Download the selected model and make it the default.
+- Show the model's download percentage while the pull is in progress.
 - Return a clear, actionable error when model discovery is unavailable or no compatible models are found.
 
 ### `aia config`

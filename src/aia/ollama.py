@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 import json
 import logging
 import time
@@ -67,11 +67,50 @@ class OllamaClient:
         result = self._request("GET", "ps")
         return list(result.get("models", []))
 
-    def pull(self, model: str) -> None:
+    def pull(self, model: str, progress: Callable[[int], None] | None = None) -> None:
         self.logger.info("Pulling model %s", model)
-        self._request(
-            "POST", "pull", {"model": model, "stream": False}, timeout=None
+        payload = json.dumps({"model": model, "stream": True}).encode()
+        request = Request(
+            f"{self.base_url}/pull",
+            data=payload,
+            method="POST",
+            headers={"Content-Type": "application/json"},
         )
+        last_percentage = -1
+        tracked_total = 0
+        try:
+            with urlopen(request, timeout=None) as response:
+                for raw_line in response:
+                    if not raw_line.strip():
+                        continue
+                    event = json.loads(raw_line)
+                    if event.get("error"):
+                        raise AiaError(f"Download failed: {event['error']}")
+                    completed = event.get("completed")
+                    total = event.get("total")
+                    if (
+                        isinstance(completed, int)
+                        and isinstance(total, int)
+                        and total > 0
+                        and total >= tracked_total
+                    ):
+                        tracked_total = total
+                        percentage = min(100, completed * 100 // total)
+                        if progress and percentage != last_percentage:
+                            progress(percentage)
+                        last_percentage = percentage
+                    if event.get("status") == "success" and last_percentage < 100:
+                        if progress:
+                            progress(100)
+                        last_percentage = 100
+        except AiaError:
+            raise
+        except HTTPError as error:
+            self.logger.exception("Ollama pull failed for %s", model)
+            raise AiaError(f"Download failed ({error.code}). Check the AIA log.") from error
+        except (URLError, TimeoutError, OSError, json.JSONDecodeError) as error:
+            self.logger.exception("Ollama pull failed for %s", model)
+            raise AiaError("Download failed. Check the AIA log.") from error
 
     def delete(self, model: str) -> None:
         self.logger.info("Deleting model %s", model)
