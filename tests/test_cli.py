@@ -24,6 +24,7 @@ class FakeClient:
         self.pulled: list[str] = []
         self.deleted: list[str] = []
         self.unloaded: list[str] = []
+        self.pull_progress: list[int] = []
         self.logger = logging.getLogger("test.fake-client")
 
     def installed_models(self):
@@ -32,8 +33,11 @@ class FakeClient:
     def running_models(self):
         return list(self.running)
 
-    def pull(self, model):
+    def pull(self, model, progress=None):
         self.pulled.append(model)
+        if progress:
+            for percentage in (25, 75, 100):
+                progress(percentage)
 
     def delete(self, model):
         self.deleted.append(model)
@@ -76,6 +80,7 @@ class CliFunctionalTests(unittest.TestCase):
             error=self.errors.append,
             client=self.client,  # type: ignore[arg-type]
             store=self.store,
+            progress=lambda _model, percentage: self.client.pull_progress.append(percentage),
         )
 
     def test_help_advertises_every_command(self) -> None:
@@ -121,6 +126,7 @@ class CliFunctionalTests(unittest.TestCase):
         self.assertEqual(self.store.get_default(), "tiny")
         self.assertEqual(self.output[0], "Retrieving models...")
         self.assertEqual(self.output[1], "Select a model to install:")
+        self.assertEqual(self.client.pull_progress, [0, 25, 75, 100])
 
     def test_unquoted_message_streams_and_unloads(self) -> None:
         self.store.set_default("model-1")

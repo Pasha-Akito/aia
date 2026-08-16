@@ -49,7 +49,11 @@ class LifecycleHandler(BaseHTTPRequestHandler):
         if self.path == "/api/pull":
             model = payload["model"]
             type(self).installed = [{"name": model, "size": 1024**3}]
-            self._send({"status": "success"})
+            self._send(
+                b'{"status":"downloading","completed":50,"total":100}\n'
+                b'{"status":"success"}\n',
+                "application/x-ndjson",
+            )
         elif self.path == "/api/generate" and payload.get("prompt"):
             type(self).running = [{"name": payload["model"]}]
             self._send(
@@ -125,6 +129,8 @@ class InstalledExecutableEndToEndTests(unittest.TestCase):
             "Retrieving models...\nSelect a model to install:\n1. tiny:1b",
             first_setup.stdout,
         )
+        self.assertIn("Downloading tiny:1b:  50%", first_setup.stdout)
+        self.assertIn("Downloading tiny:1b: 100%", first_setup.stdout)
 
         prompt = self.run_aia("What", "does", "ls", "do?")
         self.assertEqual(prompt.returncode, 0, prompt.stderr)

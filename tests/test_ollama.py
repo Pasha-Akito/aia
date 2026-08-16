@@ -44,6 +44,17 @@ class FakeOllamaHandler(BaseHTTPRequestHandler):
         self.requests.append(("POST", self.path, payload))
         if self.path == "/api/pull":
             time.sleep(type(self).pull_delay)
+            body = (
+                b'{"status":"downloading","completed":50,"total":100}\n'
+                b'{"status":"downloading config","completed":10,"total":10}\n'
+                b'{"status":"success"}\n'
+            )
+            self.send_response(200)
+            self.send_header("Content-Type", "application/x-ndjson")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
         if self.path == "/api/generate" and payload.get("prompt"):
             body = b'{"response":"hello ","done":false}\n{"response":"world","done":true}\n'
             self.send_response(200)
@@ -94,12 +105,14 @@ class OllamaIntegrationTests(unittest.TestCase):
         methods = [request[0] for request in FakeOllamaHandler.requests]
         self.assertIn("DELETE", methods)
 
-    def test_pull_uses_non_streaming_api(self) -> None:
-        self.client.pull("tiny:latest")
+    def test_pull_streams_largest_layer_percentage(self) -> None:
+        percentages: list[int] = []
+        self.client.pull("tiny:latest", percentages.append)
         self.assertIn(
-            ("POST", "/api/pull", {"model": "tiny:latest", "stream": False}),
+            ("POST", "/api/pull", {"model": "tiny:latest", "stream": True}),
             FakeOllamaHandler.requests,
         )
+        self.assertEqual(percentages, [50, 100])
 
     def test_pull_is_not_limited_by_normal_request_timeout(self) -> None:
         host, port = self.server.server_address

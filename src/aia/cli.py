@@ -51,6 +51,13 @@ def format_installed(model: dict[str, object]) -> str:
     return name
 
 
+def terminal_progress(model: str, percentage: int) -> None:
+    sys.stdout.write(f"\rDownloading {model}: {percentage:3d}%")
+    if percentage == 100:
+        sys.stdout.write("\n")
+    sys.stdout.flush()
+
+
 def recover_unload(client: OllamaClient, model: str) -> bool:
     if client.unload_and_verify(model):
         return True
@@ -71,6 +78,7 @@ def setup_command(
     *,
     input_fn: Callable[[str], str],
     output: Callable[[str], None],
+    progress: Callable[[str, int], None],
 ) -> int:
     installed = {model_name(item) for item in client.installed_models()}
     output("Retrieving models...")
@@ -84,8 +92,8 @@ def setup_command(
     )
     if selected is None:
         return 0
-    output(f"Downloading {selected.name}...")
-    client.pull(selected.name)
+    progress(selected.name, 0)
+    client.pull(selected.name, lambda percentage: progress(selected.name, percentage))
     store.set_default(selected.name)
     output(f"Default: {selected.name}")
     return 0
@@ -183,6 +191,7 @@ def main(
     error: Callable[[str], None] | None = None,
     client: OllamaClient | None = None,
     store: ConfigStore | None = None,
+    progress: Callable[[str, int], None] | None = None,
 ) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     verbose = False
@@ -199,6 +208,7 @@ def main(
         ollama_api_url(os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")), logger
     )
     store = store or ConfigStore()
+    progress = progress or terminal_progress
     if not args:
         error("Specify a command or message. Run: aia help")
         return 2
@@ -210,7 +220,9 @@ def main(
         elif command == "first-time-setup":
             result = first_time_setup(input_fn=input_fn, output=output)
         elif command == "setup":
-            result = setup_command(client, store, input_fn=input_fn, output=output)
+            result = setup_command(
+                client, store, input_fn=input_fn, output=output, progress=progress
+            )
         elif command == "config":
             result = config_command(client, store, input_fn=input_fn, output=output)
         elif command == "delete":
